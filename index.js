@@ -1,5 +1,5 @@
 const express = require('express');
-const crypto = require('crypto')
+const crypto = require('crypto');
 const app = express();
 const port = 3000;
 
@@ -14,9 +14,9 @@ async function decrypt(message) {
     await crypto.subtle.decrypt(
       {
         name: "AES-GCM",
-        iv: new Uint8Array(JSON.parse(atob(b)))
+        iv: new Uint8Array(JSON.parse(Buffer.from(b, 'base64')))
       },
-      await crypto.subtle.importKey("raw", new Uint8Array(JSON.parse(atob(c))), { name: "AES-GCM" }, false, ["decrypt"]), new Uint8Array(await message.arrayBuffer())
+      await crypto.subtle.importKey("raw", new Uint8Array(JSON.parse(Buffer.from(c, 'base64'))), { name: "AES-GCM" }, false, ["decrypt"]), new Uint8Array(await message.arrayBuffer())
     )
   );
 }
