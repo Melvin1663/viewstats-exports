@@ -39,7 +39,7 @@ app.get('/get/vid/stats/:videoId', async (req, res) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 
-    let base = `https://www.viewstats.com/api/videoStats?videoId=${videoId}&withRevenue=true`;
+    let base = `https://www.viewstats.com/api/videoStats?videoId=${videoId}&withRevenue=true&groupBy=none`;
 
     let data = await fetch(base, {
       headers: {
