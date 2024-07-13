@@ -1,5 +1,4 @@
 const express = require('express');
-const rateLimit = require("express-rate-limit");
 const crypto = require('crypto');
 const app = express();
 const port = 5004;
@@ -10,32 +9,18 @@ const c = "Wy0zLCAtMTEyLCAxNSwgLTEyNCwgLTcxLCAzMywgLTg0LCAxMDksIDU3LCAtMTI3LCAxM
 
 app.use(express.json());
 
-const limiter = rateLimit({
-  max: 500,
-  windowMs: 60 * 60 * 1000,
-  message: "Too many requests from this IP",
-  validate: { xForwardedForHeader: false }
-});
-
-app.use(limiter);
+let key;
+let algo;
 
 async function decrypt(message) {
-  return new TextDecoder("utf-8").decode(
-    await crypto.subtle.decrypt(
-      {
-        name: "AES-GCM",
-        iv: new Uint8Array(JSON.parse(Buffer.from(b, 'base64')))
-      },
-      await crypto.subtle.importKey("raw", new Uint8Array(JSON.parse(Buffer.from(c, 'base64'))), { name: "AES-GCM" }, false, ["decrypt"]), new Uint8Array(await message.arrayBuffer())
-    )
-  );
+  return new TextDecoder("utf-8").decode(await crypto.subtle.decrypt(algo, key, new Uint8Array(await message.arrayBuffer())));
 }
 
 app.get('/get/vid/stats/:videoId', async (req, res) => {
   try {
     let { videoId } = req.params;
 
-    res.setHeader('Access-Control-Allow-Origin', 'https://milivin.pages.dev');
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 
@@ -66,7 +51,7 @@ app.get('/get/channel/stats/:handle', async (req, res) => {
   try {
     let { handle } = req.params;
 
-    res.setHeader('Access-Control-Allow-Origin', 'https://milivin.pages.dev');
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 
@@ -93,6 +78,9 @@ app.get('/get/channel/stats/:handle', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
+  key = await crypto.subtle.importKey("raw", new Uint8Array(JSON.parse(Buffer.from(c, 'base64'))), { name: "AES-GCM" }, false, ["decrypt"]);
+  algo = { name: "AES-GCM", iv: new Uint8Array(JSON.parse(Buffer.from(b, 'base64'))) };
+
   console.log(`Server is running on http://localhost:${port}`);
 });
