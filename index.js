@@ -1,5 +1,6 @@
 const express = require('express');
 const crypto = require('crypto');
+const config = require('./config.json');
 const app = express();
 const port = 5004;
 
@@ -29,7 +30,8 @@ app.get('/get/vid/stats/:videoId', async (req, res) => {
     let data = await fetch(base, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer 32ev9m0qggn227ng1rgpbv5j8qllas8uleujji3499g9had6oj7f0ltnvrgi00cq",
+        Authorization: config.auth,
+        Cookie: config.cookie
       },
     });
 
@@ -60,7 +62,7 @@ app.get('/get/channel/stats/:handle', async (req, res) => {
     let data = await fetch(base, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer 32ev9m0qggn227ng1rgpbv5j8qllas8uleujji3499g9had6oj7f0ltnvrgi00cq",
+        Authorization: config.auth
       },
     });
 
